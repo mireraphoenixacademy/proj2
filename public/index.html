@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.3.1/html-docx.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <label for="username">Username:</label><br>
+                <input type="text" id="username" required><br>
+                <label for="password">Password:</label><br>
+                <input type="password" id="password" required><br>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp">
+        <div class="hamburger">
+            <i class="fas fa-bars"></i>
+        </div>
+
+        <div class="sidebar">
+            <h2>School Management</h2>
+            <a href="#dashboard">Dashboard</a>
+            <a href="#learners">Manage Learners</a>
+            <a href="#fees">Manage Fees</a>
+            <a href="#books">Manage Books</a>
+            <a href="#classBooks">Class Books</a>
+            <a href="#transferRequests">Transfer Requests</a>
+            <a href="#feeStructure">Fee Structure</a>
+            <a href="#termSettings">Term Settings</a>
+            <a href="#" id="logoutBtn">Logout</a>
+        </div>
+
+        <div class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard">
+                <h2>Dashboard</h2>
+                <p>Welcome to the School Management System. Current Term: <span id="currentTermYear"></span></p>
+                <button id="newAcademicYearBtn">Start New Academic Year</button>
+            </section>
+
+            <!-- Manage Learners Section -->
+            <section id="learners">
+                <h2>Manage Learners</h2>
+                <button class="add-learner-btn">Add New Learner</button>
+                <div>
+                    <label for="learnerYearSelect">Select Year:</label>
+                    <select id="learnerYearSelect"></select>
+                    <button id="downloadLearnersExcelBtn">Download Excel</button>
+                    <button id="downloadLearnersWordBtn">Download Word</button>
+                    <button id="downloadLearnersPdfBtn">Download PDF</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Admission No.</th>
+                            <th>Full Name</th>
+                            <th>Gender</th>
+                            <th>DoB</th>
+                            <th>Grade</th>
+                            <th>Assessment Number</th>
+                            <th>Parent Name</th>
+                            <th>Parent Contact</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="learnersBody"></tbody>
+                </table>
+                <div class="pagination">
+                    <button id="prevBtn">Previous</button>
+                    <span id="pageInfo"></span>
+                    <button id="nextBtn">Next</button>
+                </div>
+            </section>
+
+            <!-- Manage Fees Section -->
+            <section id="fees">
+                <h2>Manage Fees</h2>
+                <button class="add-fee-btn">Add New Fee</button>
+                <button id="downloadFeesExcelBtn">Download Excel</button>
+                <button id="downloadFeesWordBtn">Download Word</button>
+                <button id="downloadFeesPdfBtn">Download PDF</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Admission No.</th>
+                            <th>Full Name</th>
+                            <th>Term</th>
+                            <th>Amount Paid</th>
+                            <th>Balance</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="feesBody"></tbody>
+                </table>
+            </section>
+
+            <!-- Manage Books Section -->
+            <section id="books">
+                <h2>Manage Books</h2>
+                <button class="add-book-btn">Add New Book</button>
+                <button id="downloadBooksExcelBtn">Download Excel</button>
+                <button id="downloadBooksWordBtn">Download Word</button>
+                <button id="downloadBooksPdfBtn">Download PDF</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Admission No.</th>
+                            <th>Full Name</th>
+                            <th>Subject</th>
+                            <th>Book Title</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="booksBody"></tbody>
+                </table>
+            </section>
+
+            <!-- Class Books Section -->
+            <section id="classBooks">
+                <h2>Class Books</h2>
+                <button class="add-class-book-btn">Add New Class Book</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Book Number</th>
+                            <th>Subject</th>
+                            <th>Book Description</th>
+                            <th>Total Number of Books</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="classBooksBody"></tbody>
+                </table>
+            </section>
+
+            <!-- Transfer Requests Section -->
+            <section id="transferRequests">
+                <h2>Transfer Requests</h2>
+                <label for="transferRequests">Transfer Requests:</label><br>
+                <textarea id="transferRequests" rows="5" cols="50"></textarea>
+            </section>
+
+            <!-- Fee Structure Section -->
+            <section id="feeStructure">
+                <h2>Fee Structure</h2>
+                <form id="feeStructureForm">
+                    <label for="playgroupFee">Playgroup Fee per Term:</label>
+                    <input type="number" id="playgroupFee" required><br>
+                    <label for="pp1Fee">PP1 Fee per Term:</label>
+                    <input type="number" id="pp1Fee" required><br>
+                    <label for="pp2Fee">PP2 Fee per Term:</label>
+                    <input type="number" id="pp2Fee" required><br>
+                    <label for="grade1Fee">Grade 1 Fee per Term:</label>
+                    <input type="number" id="grade1Fee" required><br>
+                    <label for="grade2Fee">Grade 2 Fee per Term:</label>
+                    <input type="number" id="grade2Fee" required><br>
+                    <label for="grade3Fee">Grade 3 Fee per Term:</label>
+                    <input type="number" id="grade3Fee" required><br>
+                    <label for="grade4Fee">Grade 4 Fee per Term:</label>
+                    <input type="number" id="grade4Fee" required><br>
+                    <label for="grade5Fee">Grade 5 Fee per Term:</label>
+                    <input type="number" id="grade5Fee" required><br>
+                    <label for="grade6Fee">Grade 6 Fee per Term:</label>
+                    <input type="number" id="grade6Fee" required><br>
+                    <label for="grade7Fee">Grade 7 Fee per Term:</label>
+                    <input type="number" id="grade7Fee" required><br>
+                    <label for="grade8Fee">Grade 8 Fee per Term:</label>
+                    <input type="number" id="grade8Fee" required><br>
+                    <label for="grade9Fee">Grade 9 Fee per Term:</label>
+                    <input type="number" id="grade9Fee" required><br>
+                    <button type="submit">Save Fee Structure</button>
+                </form>
+            </section>
+
+            <!-- Term Settings Section -->
+            <section id="termSettings">
+                <h2>Term Settings</h2>
+                <form id="termSettingsForm">
+                    <label for="currentTerm">Current Term:</label>
+                    <select id="currentTerm" required>
+                        <option value="Term 1">Term 1</option>
+                        <option value="Term 2">Term 2</option>
+                        <option value="Term 3">Term 3</option>
+                    </select><br>
+                    <label for="currentYear">Current Year:</label>
+                    <input type="number" id="currentYear" required min="2020" max="2100"><br>
+                    <button type="submit">Save Term Settings</button>
+                </form>
+            </section>
+        </div>
+    </div>
+
+    <!-- Add Learner Modal -->
+    <div id="addLearnerForm" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Add New Learner</h2>
+            <form id="learnerForm">
+                <label for="fullName">Full Name:</label><br>
+                <input type="text" id="fullName" required><br>
+                <label for="gender">Gender:</label><br>
+                <select id="gender" required>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select><br>
+                <label for="dob">Date of Birth:</label><br>
+                <input type="date" id="dob" required><br>
+                <label for="grade">Grade:</label><br>
+                <select id="grade" required>
+                    <option value="Playgroup">Playgroup</option>
+                    <option value="PP1">PP1</option>
+                    <option value="PP2">PP2</option>
+                    <option value="Grade 1">Grade 1</option>
+                    <option value="Grade 2">Grade 2</option>
+                    <option value="Grade 3">Grade 3</option>
+                    <option value="Grade 4">Grade 4</option>
+                    <option value="Grade 5">Grade 5</option>
+                    <option value="Grade 6">Grade 6</option>
+                    <option value="Grade 7">Grade 7</option>
+                    <option value="Grade 8">Grade 8</option>
+                    <option value="Grade 9">Grade 9</option>
+                </select><br>
+                <label for="assessmentNumber" id="assessmentLabel">Assessment Number:</label><br>
+                <input type="text" id="assessmentNumber"><br>
+                <label for="parentName">Parent Name:</label><br>
+                <input type="text" id="parentName" required><br>
+                <label for="parentPhone">Parent Phone:</label><br>
+                <input type="tel" id="parentPhone" required><br>
+                <label for="parentEmail">Parent Email:</label><br>
+                <input type="email" id="parentEmail" required><br>
+                <button type="submit">Save</button>
+                <button type="button" class="cancel">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Learner Modal -->
+    <div id="editLearnerForm" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Edit Learner</h2>
+            <form id="editLearnerFormElement">
+                <input type="hidden" id="editLearnerIndex">
+                <label for="editFullName">Full Name:</label><br>
+                <input type="text" id="editFullName" required><br>
+                <label for="editGender">Gender:</label><br>
+                <select id="editGender" required>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select><br>
+                <label for="editDob">Date of Birth:</label><br>
+                <input type="date" id="editDob" required><br>
+                <label for="editGrade">Grade:</label><br>
+                <select id="editGrade" required>
+                    <option value="Playgroup">Playgroup</option>
+                    <option value="PP1">PP1</option>
+                    <option value="PP2">PP2</option>
+                    <option value="Grade 1">Grade 1</option>
+                    <option value="Grade 2">Grade 2</option>
+                    <option value="Grade 3">Grade 3</option>
+                    <option value="Grade 4">Grade 4</option>
+                    <option value="Grade 5">Grade 5</option>
+                    <option value="Grade 6">Grade 6</option>
+                    <option value="Grade 7">Grade 7</option>
+                    <option value="Grade 8">Grade 8</option>
+                    <option value="Grade 9">Grade 9</option>
+                </select><br>
+                <label for="editAssessmentNumber" id="editAssessmentLabel">Assessment Number:</label><br>
+                <input type="text" id="editAssessmentNumber"><br>
+                <label for="editParentName">Parent Name:</label><br>
+                <input type="text" id="editParentName" required><br>
+                <label for="editParentPhone">Parent Phone:</label><br>
+                <input type="tel" id="editParentPhone" required><br>
+                <label for="editParentEmail">Parent Email:</label><br>
+                <input type="email" id="editParentEmail" required><br>
+                <button type="submit">Save</button>
+                <button type="button" class="cancel">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Fee Modal -->
+    <div id="addFeeForm" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Add New Fee</h2>
+            <form id="feeForm">
+                <label for="feeAdmissionNo">Admission No:</label><br>
+                <select id="feeAdmissionNo" required></select><br>
+                <label for="term">Term:</label><br>
+                <select id="term" required>
+                    <option value="Term 1">Term 1</option>
+                    <option value="Term 2">Term 2</option>
+                    <option value="Term 3">Term 3</option>
+                </select><br>
+                <label for="amountPaid">Amount Paid:</label><br>
+                <input type="number" id="amountPaid" required><br>
+                <button type="submit">Save</button>
+                <button type="button" class="cancel">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Fee Modal -->
+    <div id="editFeeForm" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Edit Fee</h2>
+            <form id="editFeeFormElement">
+                <input type="hidden" id="editFeeIndex">
+                <label for="editFeeAdmissionNo">Admission No:</label><br>
+                <select id="editFeeAdmissionNo" required></select><br>
+                <label for="editTerm">Term:</label><br>
+                <select id="editTerm" required>
+                    <option value="Term 1">Term 1</option>
+                    <option value="Term 2">Term 2</option>
+                    <option value="Term 3">Term 3</option>
+                </select><br>
+                <label for="editAmountPaid">Amount Paid:</label><br>
+                <input type="number" id="editAmountPaid" required><br>
+                <button type="submit">Save</button>
+                <button type="button" class="cancel">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Book Modal -->
+    <div id="addBookForm" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Add New Book</h2>
+            <form id="bookForm">
+                <label for="bookAdmissionNo">Admission No:</label><br>
+                <select id="bookAdmissionNo" required></select><br>
+                <label for="subject">Subject:</label><br>
+                <input type="text" id="subject" required><br>
+                <label for="bookTitle">Book Title:</label><br>
+                <input type="text" id="bookTitle" required><br>
+                <button type="submit">Save</button>
+                <button type="button" class="cancel">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Book Modal -->
+    <div id="editBookForm" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Edit Book</h2>
+            <form id="editBookFormElement">
+                <input type="hidden" id="editBookIndex">
+                <label for="editBookAdmissionNo">Admission No:</label><br>
+                <select id="editBookAdmissionNo" required></select><br>
+                <label for="editSubject">Subject:</label><br>
+                <input type="text" id="editSubject" required><br>
+                <label for="editBookTitle">Book Title:</label><br>
+                <input type="text" id="editBookTitle" required><br>
+                <button type="submit">Save</button>
+                <button type="button" class="cancel">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Class Book Modal -->
+    <div id="addClassBookForm" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Add New Class Book</h2>
+            <form id="classBookForm">
+                <label for="bookNumber">Book Number:</label><br>
+                <input type="text" id="bookNumber" required><br>
+                <label for="classSubject">Subject:</label><br>
+                <input type="text" id="classSubject" required><br>
+                <label for="bookDescription">Book Description:</label><br>
+                <input type="text" id="bookDescription" required><br>
+                <label for="totalBooks">Total Number of Books:</label><br>
+                <input type="number" id="totalBooks" required><br>
+                <button type="submit">Save</button>
+                <button type="button" class="cancel">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Class Book Modal -->
+    <div id="editClassBookForm" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Edit Class Book</h2>
+            <form id="editClassBookFormElement">
+                <input type="hidden" id="editClassBookIndex">
+                <label for="editBookNumber">Book Number:</label><br>
+                <input type="text" id="editBookNumber" required><br>
+                <label for="editClassSubject">Subject:</label><br>
+                <input type="text" id="editClassSubject" required><br>
+                <label for="editBookDescription">Book Description:</label><br>
+                <input type="text" id="editBookDescription" required><br>
+                <label for="editTotalBooks">Total Number of Books:</label><br>
+                <input type="number" id="editTotalBooks" required><br>
+                <button type="submit">Save</button>
+                <button type="button" class="cancel">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
